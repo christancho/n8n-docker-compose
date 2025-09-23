@@ -22,6 +22,9 @@ x-shared: &shared
     
     - N8N_SECURE_COOKIE=false
     - WEBHOOK_URL=${WEBHOOK_URL}
+    - N8N_HOST=${N8N_HOST}
+    - N8N_PORT=${N8N_PORT}
+    - N8N_PROTOCOL=${N8N_PROTOCOL}
     # Worker configuration (only needed for n8n paid versions)
     # Uncomment the following lines if you have n8n paid license and want to use workers
     # - N8N_RUNNERS_ENABLED=true
@@ -30,7 +33,6 @@ x-shared: &shared
     - N8N_LOG_LEVEL=info
     - N8N_LOG_OUTPUT=console
     - N8N_TRUST_PROXY=true
-    - N8N_PROTOCOL=https
     # Performance optimizations for Synology NAS
     - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
     - N8N_EXECUTION_DATA_PRUNE_MAX_COUNT=10000
