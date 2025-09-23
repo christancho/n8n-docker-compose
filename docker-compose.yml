@@ -16,6 +16,7 @@ x-shared: &shared
     
     - N8N_ENCRYPTION_KEY=${ENCRYPTION_KEY}
     - GENERIC_TIMEZONE=${TIMEZONE}
+    - TZ=${TIMEZONE}
     #Synology NAS configuration
     - PUID=${PUID}
     - PGID=${PGID}
