@@ -1,16 +1,18 @@
 # n8n Docker Compose Stack
 
-A production-ready n8n automation platform setup using Docker Compose, optimized for Portainer deployment. This stack includes n8n with PostgreSQL database, Redis queue, and worker nodes for scalable automation workflows.
+A production-ready n8n automation platform setup using Docker Compose, optimized for Portainer deployment. This stack includes n8n with PostgreSQL database, Redis caching, and comprehensive configuration for reliable automation workflows.
 
 ## 🚀 Features
 
 - **Production-ready n8n setup** with PostgreSQL database
-- **Redis queue system** for reliable workflow execution
-- **Worker nodes** for horizontal scaling
+- **Redis caching system** for improved performance
 - **Optimized for Synology NAS** and other resource-constrained environments
-- **Health checks** and resource limits
+- **Health checks** and resource limits with improved reliability
 - **Security hardening** with proper user permissions
 - **Performance optimizations** for better execution
+- **Comprehensive webhook configuration** to fix localhost issues
+- **Worker support** (commented out for free version compatibility)
+- **Complete directory structure** with .gitkeep files
 
 ## 📋 Prerequisites
 
@@ -21,7 +23,11 @@ A production-ready n8n automation platform setup using Docker Compose, optimized
 
 ## 🔧 Environment Variables
 
-Create a `.env` file in the project root with the following variables:
+This project includes a comprehensive `env.example` file with detailed documentation for all environment variables. Copy it to `.env` and update with your values:
+
+```bash
+cp env.example .env
+```
 
 ### Required Variables
 
@@ -38,7 +44,12 @@ ENCRYPTION_KEY=your_32_character_encryption_key_here
 TIMEZONE=America/Toronto
 PUID=1000
 PGID=1000
+
+# Webhook and Host Configuration (Fixes localhost webhook issue)
 WEBHOOK_URL=https://your-domain.com
+N8N_HOST=your-domain.com
+N8N_PORT=5678
+N8N_PROTOCOL=https
 
 # Directory Configuration
 N8N_DIR=/opt/n8n
@@ -52,13 +63,15 @@ N8N_LOG_LEVEL=info
 
 # Security
 N8N_SECURE_COOKIE=false
-N8N_PROTOCOL=https
+N8N_TRUST_PROXY=true
 
 # Performance
 N8N_DEFAULT_BINARY_DATA_MODE=filesystem
 N8N_EXECUTION_DATA_PRUNE_MAX_COUNT=10000
 N8N_EXECUTION_DATA_MAX_AGE=168
 ```
+
+> **📖 For complete documentation**: See `env.example` for detailed explanations of all variables, including security notes and best practices.
 
 ## 🐳 Quick Start with Docker Compose
 
@@ -70,13 +83,13 @@ N8N_EXECUTION_DATA_MAX_AGE=168
 
 2. **Create environment file:**
    ```bash
-   cp .env.example .env
+   cp env.example .env
    # Edit .env with your configuration
    ```
 
 3. **Create required directories:**
    ```bash
-   sudo mkdir -p /opt/n8n/{n8n,postgres/data,redis}
+   sudo mkdir -p /opt/n8n/{n8n/files,postgres/data,redis}
    sudo chown -R 1000:1000 /opt/n8n
    ```
 
@@ -86,8 +99,19 @@ N8N_EXECUTION_DATA_MAX_AGE=168
    ```
 
 5. **Access n8n:**
-   - Open your browser to `http://localhost:5678`
+   - Open your browser to `http://localhost:5678` (or your configured domain)
    - Complete the initial setup wizard
+
+## 🔗 Webhook Configuration
+
+This stack includes proper webhook configuration to prevent the common "localhost" webhook URL issue:
+
+- **`WEBHOOK_URL`**: Set to your full domain (e.g., `https://n8n.yourdomain.com`)
+- **`N8N_HOST`**: Set to your domain name
+- **`N8N_PROTOCOL`**: Set to `https` for production
+- **`N8N_PORT`**: Default is `5678`
+
+This ensures webhooks use your actual domain instead of localhost.
 
 ## 🚢 Deploy with Portainer
 
@@ -222,9 +246,20 @@ tar -czf n8n-backup.tar.gz /opt/n8n/n8n/
    - Adjust resource limits in `docker-compose.yml`
    - Monitor system resources in Portainer
 
-4. **Webhook not working:**
-   - Verify `WEBHOOK_URL` is correctly set
+4. **Webhook shows localhost instead of domain:**
+   - Verify `WEBHOOK_URL`, `N8N_HOST`, `N8N_PROTOCOL` are correctly set
+   - Ensure all webhook environment variables match your domain
    - Check firewall and port forwarding
+
+5. **Container shows as unhealthy:**
+   - Check container logs: `docker logs n8n_main`
+   - Verify n8n is accessible: `docker exec n8n_main curl -f http://localhost:5678/`
+   - Healthcheck may be temporarily disabled for troubleshooting
+
+6. **Portainer deployment fails:**
+   - Ensure all environment variables use simple `${VAR}` syntax
+   - Avoid `${VAR:-default}` syntax as Portainer doesn't support it
+   - Check that all required variables are set
 
 ### Logs and Debugging
 
@@ -271,3 +306,11 @@ For issues and questions:
 - Check the [troubleshooting section](#-troubleshooting)
 - Review n8n documentation
 - Open an issue in this repository
+
+## ☕ Support This Project
+
+If this project has helped you, consider supporting its development:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-☕-yellow.svg)](https://buymeacoffee.com/christancho)
+
+Your support helps maintain and improve this n8n Docker Compose stack!
