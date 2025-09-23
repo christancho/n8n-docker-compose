@@ -150,11 +150,11 @@ services:
     ports:
       - 5678:5678
     healthcheck:
-       test: ['CMD-SHELL', 'curl -f http://localhost:5678/ || exit 1']
+       test: ['CMD-SHELL', 'curl -f http://localhost:5678/healthz || curl -f http://localhost:5678/ || exit 1']
        interval: 30s
-       timeout: 10s
-       retries: 5
-       start_period: 120s
+       timeout: 15s
+       retries: 10
+       start_period: 300s
 
   n8n-worker:
     container_name: n8n_worker
