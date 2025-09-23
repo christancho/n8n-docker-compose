@@ -158,7 +158,7 @@ services:
        interval: 60s
        timeout: 30s
        retries: 5
-       start_period: 600s
+       start_period: 120s
 
   # n8n-worker: Only available in n8n paid versions
   # Uncomment the following section if you have n8n paid license
