@@ -8,8 +8,7 @@ x-shared: &shared
     - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
     - DB_POSTGRESDB_USER=${POSTGRES_NON_ROOT_USER}
     - DB_POSTGRESDB_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
-    # Redis queue configuration
-    - EXECUTIONS_MODE=queue
+    # Redis configuration
     - QUEUE_BULL_REDIS_HOST=n8n_redis
     - QUEUE_BULL_REDIS_PORT=6379
     - QUEUE_BULL_REDIS_DB=0
@@ -23,9 +22,11 @@ x-shared: &shared
     
     - N8N_SECURE_COOKIE=false
     - WEBHOOK_URL=${WEBHOOK_URL}
-    - N8N_RUNNERS_ENABLED=true
-    - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-    - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
+    # Worker configuration (only needed for n8n paid versions)
+    # Uncomment the following lines if you have n8n paid license and want to use workers
+    # - N8N_RUNNERS_ENABLED=true
+    # - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+    # - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
     - N8N_LOG_LEVEL=info
     - N8N_LOG_OUTPUT=console
     - N8N_TRUST_PROXY=true
@@ -150,25 +151,27 @@ services:
     ports:
       - 5678:5678
     healthcheck:
-       test: ['CMD-SHELL', 'curl -f http://localhost:5678/healthz || curl -f http://localhost:5678/ || exit 1']
-       interval: 30s
-       timeout: 15s
-       retries: 10
-       start_period: 300s
+       test: ['CMD-SHELL', 'curl -f http://localhost:5678/ || exit 1']
+       interval: 60s
+       timeout: 30s
+       retries: 5
+       start_period: 600s
 
-  n8n-worker:
-    container_name: n8n_worker
-    <<: *shared
-    command: worker
-    depends_on:
-      n8n:
-        condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 768M
-        reservations:
-          memory: 384M
+  # n8n-worker: Only available in n8n paid versions
+  # Uncomment the following section if you have n8n paid license
+  # n8n-worker:
+  #   container_name: n8n_worker
+  #   <<: *shared
+  #   command: worker
+  #   depends_on:
+  #     n8n:
+  #       condition: service_started
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 768M
+  #       reservations:
+  #         memory: 384M
 
 networks:
   n8n_net:
