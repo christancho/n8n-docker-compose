@@ -16,9 +16,11 @@ x-shared: &shared
     - QUEUE_HEALTH_CHECK_ACTIVE=true
     
     - N8N_ENCRYPTION_KEY=${ENCRYPTION_KEY}
-    - GENERIC_TIMEZONE=${TIMEZONE:America/Toronto}
+    - GENERIC_TIMEZONE=${TIMEZONE}
+    #Synology NAS configuration
     - PUID=${PUID}
     - PGID=${PGID}
+    
     - N8N_SECURE_COOKIE=false
     - WEBHOOK_URL=${WEBHOOK_URL}
     - N8N_RUNNERS_ENABLED=true
@@ -147,20 +149,20 @@ services:
     <<: *shared
     ports:
       - 5678:5678
-#    healthcheck:
-#       test: ['CMD-SHELL', 'curl -f http://localhost:5678/ || exit 1']
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
-#      start_period: 120s
+    healthcheck:
+       test: ['CMD-SHELL', 'curl -f http://localhost:5678/ || exit 1']
+       interval: 30s
+       timeout: 10s
+       retries: 5
+       start_period: 120s
 
   n8n-worker:
     container_name: n8n_worker
     <<: *shared
     command: worker
-#    depends_on:
-#      n8n:
-#        condition: service_healthy
+    depends_on:
+      n8n:
+        condition: service_healthy
     deploy:
       resources:
         limits:
