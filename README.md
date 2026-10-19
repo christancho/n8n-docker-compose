@@ -253,7 +253,8 @@ tar -czf n8n-backup.tar.gz /opt/n8n/n8n/
 
 5. **Container shows as unhealthy:**
    - Check container logs: `docker logs n8n_main`
-   - Verify n8n is accessible: `docker exec n8n_main curl -f http://localhost:5678/`
+   - Check the healthcheck result: `docker inspect --format '{{json .State.Health}}' n8n_main`
+   - Verify n8n responds (the image has no curl/wget, so use Node): `docker exec n8n_main node -e "require('http').get('http://localhost:5678/healthz', r => console.log(r.statusCode))"`
    - Healthcheck may be temporarily disabled for troubleshooting
 
 6. **Portainer deployment fails:**
